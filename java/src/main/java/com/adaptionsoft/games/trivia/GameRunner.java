@@ -4,12 +4,13 @@ public class GameRunner {
 
 	private boolean notAWinner;
 
-	public void run() {
+	public void run(Players players) {
 		Game aGame = new Game();
 
-		aGame.add("Chet");
-		aGame.add("Pat");
-		aGame.add("Sue");
+		// FIXME, next iteration : players should be provided to the Game class
+		players.list.stream()
+      .map(player -> player.name)
+      .forEach(name -> aGame.add(name));
 
 		// determinist mode to build the golden master
 		AppRandom rand = new AppRandom(true);
