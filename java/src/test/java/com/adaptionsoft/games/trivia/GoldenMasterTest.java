@@ -1,7 +1,5 @@
 package com.adaptionsoft.games.trivia;
 
-import com.adaptionsoft.games.trivia.runner.Console;
-import com.adaptionsoft.games.trivia.runner.GameRunner;
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -27,7 +25,7 @@ public class GoldenMasterTest {
     String goldenMaster = FileUtils.readFileToString(new File(res), "utf-8");
 
     // When
-    GameRunner.main(null);
+    App.main(null);
 
     // Then
     assertThat(Console.allContent()).isEqualTo(goldenMaster);
