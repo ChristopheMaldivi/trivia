@@ -1,29 +1,28 @@
 package com.adaptionsoft.games.trivia;
 
 public class GameRunner {
+  private final Dice dice;
 
-	private boolean notAWinner;
+  public GameRunner(Dice dice) {
+    this.dice = dice;
+  }
 
-	public void run(Players players) {
-		Game aGame = new Game();
-
-		// FIXME, next iteration : players should be provided to the Game class
-		players.list.stream()
-      .map(player -> player.name)
-      .forEach(name -> aGame.add(name));
-
-		// determinist mode to build the golden master
-		AppRandom rand = new AppRandom(true);
+  public void run(Players players) {
+		Game game = new Game(players);
 
 		do {
-			aGame.roll(rand.nextInt(5) + 1);
+			game.roll(dice.rollForGame());
 
-			if (rand.nextInt(9) == 7) {
-				notAWinner = aGame.wrongAnswer();
+			if (forceWrongAnswer()) {
+				game.wrongAnswer();
 			} else {
-				notAWinner = aGame.wasCorrectlyAnswered();
+				game.correctAnswer();
 			}
 
-		} while (notAWinner);
+		} while (!game.finished());
 	}
+
+  private boolean forceWrongAnswer() {
+    return dice.rollForWongAnswer();
+  }
 }

@@ -8,7 +8,7 @@ public class App {
       .addPlayer("Sue")
       .build();
 
-	  GameRunner gameRunner = new GameRunner();
+	  GameRunner gameRunner = new GameRunner(new Dice());
     gameRunner.run(players);
   }
 }
