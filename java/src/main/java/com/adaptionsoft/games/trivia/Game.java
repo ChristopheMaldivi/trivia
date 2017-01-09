@@ -62,31 +62,23 @@ public class Game {
     if (inPenaltyBox[currentPlayer]){
       if (isGettingOutOfPenaltyBox) {
         Console.println("Answer was correct!!!!");
-        purses[currentPlayer]++;
+        incrementPlayerPurse();
         Console.println(nameOfPlayer()
           + " now has "
-          + purses[currentPlayer]
+          + playerPurse()
           + " Gold Coins.");
-
-        currentPlayer++;
-        if (currentPlayer == players.number()) currentPlayer = 0;
-
-      } else {
-        currentPlayer++;
-        if (currentPlayer == players.number()) currentPlayer = 0;
       }
 
     } else {
       Console.println("Answer was corrent!!!!");
-      purses[currentPlayer]++;
+      incrementPlayerPurse();
       Console.println(nameOfPlayer()
         + " now has "
-        + purses[currentPlayer]
+        + playerPurse()
         + " Gold Coins.");
-
-      currentPlayer++;
-      if (currentPlayer == players.number()) currentPlayer = 0;
     }
+
+    nextPlayer();
   }
 
   public void wrongAnswer(){
@@ -94,6 +86,18 @@ public class Game {
     Console.println(nameOfPlayer() + " was sent to the penalty box");
     inPenaltyBox[currentPlayer] = true;
 
+    nextPlayer();
+  }
+
+  private int playerPurse() {
+    return purses[currentPlayer];
+  }
+
+  private void incrementPlayerPurse() {
+    purses[currentPlayer]++;
+  }
+
+  private void nextPlayer() {
     currentPlayer++;
     if (currentPlayer == players.number()) currentPlayer = 0;
   }
