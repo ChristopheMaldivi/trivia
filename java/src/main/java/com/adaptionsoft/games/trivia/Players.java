@@ -19,6 +19,10 @@ public class Players {
 
   public final List<Player> list;
 
+  public int number() {
+    return list.size();
+  }
+
   public static PlayersBuilder builder() {
     return new PlayersBuilder();
   }
