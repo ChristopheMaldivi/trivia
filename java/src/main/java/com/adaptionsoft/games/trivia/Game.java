@@ -9,7 +9,7 @@ public class Game {
   private final int[] purses;
   private final boolean[] inPenaltyBox;
 
-  int currentPlayer = 0;
+  int currentPlayer;
   boolean isGettingOutOfPenaltyBox;
 
   public Game(Players players) {
@@ -20,73 +20,62 @@ public class Game {
   }
 
   public void roll(int roll) {
-    Console.println(nameOfPlayer() + " is the current player");
-    Console.println("They have rolled a " + roll);
+    Console.println(nameOfPlayer() + " is the current player\nThey have rolled a " + roll);
 
-    if (inPenaltyBox[currentPlayer]) {
-      if (roll % 2 != 0) {
-        isGettingOutOfPenaltyBox = true;
-
-        Console.println(nameOfPlayer() + " is getting out of the penalty box");
-        places[currentPlayer] = currentPosition() + roll;
-        if (currentPosition() > 11) places[currentPlayer] = currentPosition() - 12;
-
-        Console.println(nameOfPlayer()
-          + "'s new location is "
-          + currentPosition());
-        Console.println("The category is " + questions.categoryAtPosition(currentPosition()));
-        askQuestion();
-      } else {
-        Console.println(nameOfPlayer() + " is not getting out of the penalty box");
-        isGettingOutOfPenaltyBox = false;
-      }
-
+    if (playerInPenalty()) {
+      rollFromPenaltyBox(roll);
     } else {
-      places[currentPlayer] = currentPosition() + roll;
-      if (currentPosition() > 11) places[currentPlayer] = currentPosition() - 12;
+      rollFromRegularPlace(roll);
+    }
+  }
 
-      Console.println(nameOfPlayer()
-        + "'s new location is "
-        + currentPosition());
+  public void correctAnswer() {
+    if (!playerInPenalty() || isGettingOutOfPenaltyBox) {
+      incrementPlayerPurse();
+      Console.println("Answer was correct!!!!\n" + nameOfPlayer() + " now has " + playerPurse() + " Gold Coins.");
+    }
+    nextPlayer();
+  }
+
+  public void wrongAnswer(){
+    Console.println("Question was incorrectly answered\n" + nameOfPlayer() + " was sent to the penalty box");
+    inPenaltyBox[currentPlayer] = true;
+    nextPlayer();
+  }
+
+  private void rollFromRegularPlace(int roll) {
+    updatePlayerPosition(roll);
+
+    Console.println(nameOfPlayer() + "'s new location is " + currentPosition());
+    Console.println("The category is " + questions.categoryAtPosition(currentPosition()));
+
+    askQuestion();
+  }
+
+  private void rollFromPenaltyBox(int roll) {
+    isGettingOutOfPenaltyBox = roll % 2 != 0;
+
+    Console.println(nameOfPlayer() + " is " + (isGettingOutOfPenaltyBox ? "" : "not") + "getting out of the penalty box");
+
+    if (isGettingOutOfPenaltyBox) {
+      updatePlayerPosition(roll);
+
+      Console.println(nameOfPlayer() + "'s new location is " + currentPosition());
       Console.println("The category is " + questions.categoryAtPosition(currentPosition()));
       askQuestion();
     }
-
   }
 
   private void askQuestion() {
     Console.println(questions.forPosition(currentPosition()));
   }
 
-  public void correctAnswer() {
-    if (inPenaltyBox[currentPlayer]){
-      if (isGettingOutOfPenaltyBox) {
-        Console.println("Answer was correct!!!!");
-        incrementPlayerPurse();
-        Console.println(nameOfPlayer()
-          + " now has "
-          + playerPurse()
-          + " Gold Coins.");
-      }
-
-    } else {
-      Console.println("Answer was corrent!!!!");
-      incrementPlayerPurse();
-      Console.println(nameOfPlayer()
-        + " now has "
-        + playerPurse()
-        + " Gold Coins.");
-    }
-
-    nextPlayer();
+  private boolean playerInPenalty() {
+    return inPenaltyBox[currentPlayer];
   }
 
-  public void wrongAnswer(){
-    Console.println("Question was incorrectly answered");
-    Console.println(nameOfPlayer() + " was sent to the penalty box");
-    inPenaltyBox[currentPlayer] = true;
-
-    nextPlayer();
+  private void updatePlayerPosition(int roll) {
+    places[currentPlayer] = (currentPosition() + roll) % 12;
   }
 
   private int playerPurse() {
@@ -98,8 +87,7 @@ public class Game {
   }
 
   private void nextPlayer() {
-    currentPlayer++;
-    if (currentPlayer == players.number()) currentPlayer = 0;
+    currentPlayer = (currentPlayer + 1) % players.number();
   }
 
   public boolean finished() {
