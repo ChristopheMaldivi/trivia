@@ -4,25 +4,23 @@ import java.util.Arrays;
 
 public class Game {
   private final Questions questions = new Questions();
+  private final PenaltyBox penaltyBox = new PenaltyBox();
   private final Players players;
   private final int[] places;
   private final int[] purses;
-  private final boolean[] inPenaltyBox;
 
-  int currentPlayer;
-  boolean isGettingOutOfPenaltyBox;
+  int currentPlayerId;
 
   public Game(Players players) {
     this.players = players;
     places = new int[players.number()];
     purses  = new int[players.number()];
-    inPenaltyBox  = new boolean[players.number()];
   }
 
   public void roll(int roll) {
     Console.println(nameOfPlayer() + " is the current player\nThey have rolled a " + roll);
 
-    if (playerInPenalty()) {
+    if (penaltyBox.contains(currentPlayerId)) {
       rollFromPenaltyBox(roll);
     } else {
       rollFromRegularPlace(roll);
@@ -30,7 +28,7 @@ public class Game {
   }
 
   public void correctAnswer() {
-    if (!playerInPenalty() || isGettingOutOfPenaltyBox) {
+    if (!penaltyBox.contains(currentPlayerId)) {
       incrementPlayerPurse();
       Console.println("Answer was correct!!!!\n" + nameOfPlayer() + " now has " + playerPurse() + " Gold Coins.");
     }
@@ -39,7 +37,7 @@ public class Game {
 
   public void wrongAnswer(){
     Console.println("Question was incorrectly answered\n" + nameOfPlayer() + " was sent to the penalty box");
-    inPenaltyBox[currentPlayer] = true;
+    penaltyBox.addPlayer(currentPlayerId);
     nextPlayer();
   }
 
@@ -53,11 +51,12 @@ public class Game {
   }
 
   private void rollFromPenaltyBox(int roll) {
-    isGettingOutOfPenaltyBox = roll % 2 != 0;
+    penaltyBox.playerRoll(currentPlayerId, roll);
+    boolean outOfPenaltyBox = penaltyBox.contains(currentPlayerId);
 
-    Console.println(nameOfPlayer() + " is " + (isGettingOutOfPenaltyBox ? "" : "not") + "getting out of the penalty box");
+    Console.println(nameOfPlayer() + " is " + (outOfPenaltyBox ? "" : "not") + "getting out of the penalty box");
 
-    if (isGettingOutOfPenaltyBox) {
+    if (outOfPenaltyBox) {
       updatePlayerPosition(roll);
 
       Console.println(nameOfPlayer() + "'s new location is " + currentPosition());
@@ -70,24 +69,25 @@ public class Game {
     Console.println(questions.forPosition(currentPosition()));
   }
 
-  private boolean playerInPenalty() {
-    return inPenaltyBox[currentPlayer];
+  private int playerPurse() {
+    return purses[currentPlayerId];
+  }
+  private void incrementPlayerPurse() {
+    purses[currentPlayerId]++;
   }
 
   private void updatePlayerPosition(int roll) {
-    places[currentPlayer] = (currentPosition() + roll) % 12;
+    places[currentPlayerId] = (currentPosition() + roll) % 12;
   }
-
-  private int playerPurse() {
-    return purses[currentPlayer];
-  }
-
-  private void incrementPlayerPurse() {
-    purses[currentPlayer]++;
+  private int currentPosition() {
+    return places[currentPlayerId];
   }
 
   private void nextPlayer() {
-    currentPlayer = (currentPlayer + 1) % players.number();
+    currentPlayerId = (currentPlayerId + 1) % players.number();
+  }
+  private String nameOfPlayer() {
+    return players.list.get(currentPlayerId).name;
   }
 
   public boolean finished() {
@@ -95,13 +95,5 @@ public class Game {
       .filter(purse -> purse == 6)
       .findFirst()
       .isPresent();
-  }
-
-  private String nameOfPlayer() {
-    return players.list.get(currentPlayer).name;
-  }
-
-  private int currentPosition() {
-    return places[currentPlayer];
   }
 }
