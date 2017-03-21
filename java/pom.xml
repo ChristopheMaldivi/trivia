@@ -34,12 +34,14 @@
         <artifactId>approval-core</artifactId>
         <version>0.3</version>
       </dependency>
+      <!--
       <dependency>
         <groupId>org.approvaltests</groupId>
         <artifactId>ApprovalTests</artifactId>
         <scope>system</scope>
         <systemPath>${project.basedir}/src/main/lib/ApprovalTests-0.17.jar</systemPath>
       </dependency>
+      -->
     </dependencies>
 
     <build>
